@@ -1,6 +1,7 @@
 package com.jinjin99.sketch.match.producer;
 
 import com.jinjin99.sketch.match.dto.MatchEvent;
+import com.jinjin99.sketch.match.dto.Player;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.producer.ProducerRecord;
@@ -14,16 +15,26 @@ import reactor.core.publisher.Mono;
 public class MatchEventProducerImpl implements MatchEventProducer {
 
   private static final String MatchTOPIC = "match";
-  private final ReactiveKafkaProducerTemplate<String, Object> kafkaProducer;
+  private final ReactiveKafkaProducerTemplate<String, MatchEvent> kafkaProducer;
 
   @Override
   public Mono<Integer> produceMatchStartEvent(String playerUUID, String playerNickname) {
-    return this.produceEvent(playerUUID, MatchEvent.builder().playerNickname(playerNickname).type(MatchEvent.MatchEventType.MATCH_START).build());
+    MatchEvent startEvent = MatchEvent.builder()
+            .player(Player.builder().nickname(playerNickname).sessionId(playerUUID).build())
+            .type(MatchEvent.MatchEventType.MATCH_START)
+            .build();
+
+    return this.produceEvent(playerUUID, startEvent);
   }
 
   @Override
-  public Mono<Integer> produceMatchCancelEvent(String playerUUID) {
-    return this.produceEvent(playerUUID, MatchEvent.builder().type(MatchEvent.MatchEventType.MATCH_CANCEL).build());
+  public Mono<Integer> produceMatchCancelEvent(String playerSessionId) {
+    MatchEvent cancelEvent = MatchEvent.builder()
+            .player(Player.builder().sessionId(playerSessionId).build())
+            .type(MatchEvent.MatchEventType.MATCH_CANCEL)
+            .build();
+
+    return this.produceEvent(playerSessionId, cancelEvent);
   }
 
   /**
@@ -35,7 +46,7 @@ public class MatchEventProducerImpl implements MatchEventProducer {
    * @param value      - 이벤트의 값
    * @return Mono<Integer> - 발행된 이벤트의 파티션 번호
    */
-  private Mono<Integer> produceEvent(String playerUUID, Object value) {
+  private Mono<Integer> produceEvent(String playerUUID, MatchEvent value) {
     return kafkaProducer.send(new ProducerRecord<>(MatchTOPIC, playerUUID, value)).map(result -> result.recordMetadata().partition()).onErrorResume(e -> {
       log.debug("Failed to send message to Kafka topic: {}, key: {}, value: {}, error: {}", "match", playerUUID, value, e.getMessage());
       return Mono.just(-1);

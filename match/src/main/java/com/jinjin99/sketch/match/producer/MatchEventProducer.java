@@ -21,8 +21,8 @@ public interface MatchEventProducer {
   /**
    * MatchCancelEvent를 발행합니다.
    * 이 이벤트는 매칭이 취소될 때 발생합니다.
-   * @param playerUUID - 사용자의 식별 키
+   * @param playerSessionId - 사용자의 식별 키
    * @return Mono<Integer> - MatchCancelEvent를 발행하는 Mono
    */
-  Mono<Integer> produceMatchCancelEvent(String playerUUID);
+  Mono<Integer> produceMatchCancelEvent(String playerSessionId);
 }
