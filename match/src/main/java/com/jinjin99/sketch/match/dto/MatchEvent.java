@@ -11,7 +11,7 @@ import lombok.extern.jackson.Jacksonized;
 public class MatchEvent {
   @NonNull
   private MatchEventType type;
-  private String playerNickname;
+  private Player player;
 
   public enum MatchEventType {
     MATCH_START,
