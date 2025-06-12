@@ -1,0 +1,18 @@
+spring:
+  kafka:
+    bootstrap-servers: kafka:9093
+    consumer:
+      group-id: match-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: com.jinjin99.sketch.match.dto
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+
+  data:
+    redis:
+      host: match-redis
+      port: 6379
