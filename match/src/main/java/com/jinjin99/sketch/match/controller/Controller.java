@@ -1,5 +1,6 @@
 package com.jinjin99.sketch.match.controller;
 
+import com.jinjin99.sketch.match.service.MatchEventHandler;
 import com.jinjin99.sketch.match.service.MatchingService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -13,11 +14,11 @@ import reactor.core.publisher.Mono;
 @RequiredArgsConstructor
 public class Controller {
 
-  private final MatchingService matchingService;
+  private final MatchingService matchEventHandler;
 
   @PostMapping(value = "/randomMatch")
   Mono<?> matchStart(@RequestBody String nickname) {
-    return matchingService.startMatch(nickname);
+    return matchEventHandler.start(nickname);
   }
 
 }
